@@ -1,0 +1,36 @@
+# dimensions and sizes
+geom_dim: 6
+edge_type: door
+inter_geom_dim: 2
+cats_dim: 8
+node_dim: 64
+edge_dim: 64
+graph_dim: 64
+num_layers: 5
+# network settings
+path_checkpoint: .\checkpoints
+matching: false
+message_gain: 0.1
+graph_reg: true
+graph_vec_weight: 5e-4
+aggr: add
+# optimization
+cuda: true
+distance: margin
+margin: 1
+kernel_loss: False
+n_epochs: 100
+lr: 1e-4
+bs: 32
+step: 10
+# data and paths
+data: rplan
+weak_label: miou
+path_data: /home/casper/PycharmProjects/LayoutGKN/data
+path_rplan: /home/casper/Documents/Data/rplan/dataset/floorplan_dataset   # path to RPLAN images (raw dataset)
+path_msd: /home/casper/Documents/Data/msd
+# remaining
+print_freq: 0.1
+# run
+sweep: false
+cross_val: false

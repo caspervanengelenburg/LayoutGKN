@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "LayoutGKN"
+version = "0.1.0"
+description = "LayoutGKN: Graph Similarity Learning of Floor Plans"
+readme = "README.md"
+requires-python = ">=3.8"
+
+dependencies = [
+    "torch",
+    "torchvision",
+    "scikit-learn",
+    "matplotlib",
+    "seaborn",
+    "numpy<2",
+    "networkx",
+    "Pillow",
+    "omegaconf",
+    "shapely",
+    "notebook",
+    "torch_geometric",
+    "wandb",
+    "grakel",
+    "rasterio"
+]
+
+[tool.setuptools]
+packages = ["LayoutGKN"]
+package-dir = {"" = "src"}
