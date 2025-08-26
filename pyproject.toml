@@ -1,32 +1,52 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
 [project]
 name = "LayoutGKN"
 version = "0.1.0"
+requires-python = ">=3.8"
 description = "LayoutGKN: Graph Similarity Learning of Floor Plans"
 readme = "README.md"
-requires-python = ">=3.8"
 
 dependencies = [
-    "torch",
-    "torchvision",
-    "scikit-learn",
-    "matplotlib",
-    "seaborn",
-    "numpy<2",
-    "networkx",
-    "Pillow",
-    "omegaconf",
-    "shapely",
-    "notebook",
-    "torch_geometric",
-    "wandb",
-    "grakel",
-    "rasterio"
+  "pandas",
+  "scikit-learn",
+  "matplotlib",
+  "seaborn",
+  "numpy<2",
+  "networkx",
+  "Pillow",
+  "omegaconf",
+  "shapely",
+  "notebook",
+  "wandb",
+  "grakel",
+  "rasterio"
+  # NOTE: torch*, torch_* moved to extras below
+]
+
+[project.optional-dependencies]
+# Pick CUDA or CPU at install time (you'll still pass the right indexes/links)
+torch-core = [
+  "torch==2.8.0",
+  "torchvision==0.20.0",
+]
+
+pyg-core = [
+  "torch-geometric>=2.5,<3",
+  "torch-scatter>=2.1,<2.2",
+  "torch-sparse>=0.6,<0.7",
+  "torch-cluster>=1.6,<1.7",
+  "torch-spline-conv>=1.2,<1.3",
+  "pyg-lib>=0.3,<0.4"
 ]
 
 [tool.setuptools]
 packages = ["LayoutGKN"]
 package-dir = {"" = "src"}
+
+
+# CUDA 12.8
+# uv pip install -i https://download.pytorch.org/whl/cu128 "LayoutGKN[torch-core,pyg-core]" \
+#  -f https://data.pyg.org/whl/torch-2.8.0+cu128.html
+
+# CPU-only
+# uv pip install -i https://download.pytorch.org/whl/cpu "LayoutGKN[torch-core,pyg-core]" \
+#  -f https://data.pyg.org/whl/torch-2.8.0+cpu.html
