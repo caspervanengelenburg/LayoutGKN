@@ -22,6 +22,7 @@ lr: 1e-4
 bs: 64
 step: 10
 # data and paths
+hard: true  # if hard negatives
 data: rplan
 weak_label: sged
 path_checkpoint: /home/casper/PycharmProjects/LayoutGKN/models

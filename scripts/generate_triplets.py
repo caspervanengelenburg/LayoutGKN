@@ -61,6 +61,8 @@ def main():
     # constraints for getting triplets
     ap_lim = [0.6, 1.0]  # to make sure anchor is similar to positive
     rel_lim = [0.7, 0.9]  # to ascertain hard-negatives
+    if cfg.hard:
+        rel_lim = [0.85, 0.95]  # to ascertain really hard-negatives
     for mode in ["train", "test"]:
         print(f"Generating triplets for {mode} part.")
         # TODO: REPLACE with COMPUTING SCRIPT
@@ -85,7 +87,7 @@ def main():
             try: trips_graphs.append(create_graph_triplet(trip, graphs, id_to_idx))
             except: pass
         print(f"Found {len(trips_graphs)} valid triplets.")
-        save_name = os.path.join(dir_rplan, f"trips_graphs_{mode}.pt")
+        save_name = os.path.join(dir_rplan, f"trips{'_HARD_' if cfg.hard else ''}graphs_{mode}.pt")
         torch.save(trips_graphs, save_name)
         print(f"Saved graph triplets here: {save_name}")
 

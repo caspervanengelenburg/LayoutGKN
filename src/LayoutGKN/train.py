@@ -171,9 +171,9 @@ if __name__ == '__main__':
     cfg = OmegaConf.load("/home/casper/PycharmProjects/LayoutGKN/cfg.yaml")
     cmd_cfg = OmegaConf.from_cli()
     cfg = OmegaConf.merge(cfg, cmd_cfg)
-    cfg.path_trips = os.path.join(cfg.path_data, f"rplan/trips_graphs_train.pt")
+    cfg.path_trips = os.path.join(cfg.path_data, f"rplan/trips{'_HARD_' if cfg.hard else ''}graphs_train.pt")
     # set mu based on node dimension
     if cfg.kernel_loss:
-        sigma = (cfg.node_dim / 2) ** 0.5  # std of Gaussian kernel
+        sigma = (cfg.hid_dim / 2) ** 0.5  # std of Gaussian kernel
         cfg.mu = 1 / (2 * (sigma ** 2))  # avg of Gaussian kernel
     run_single(cfg)
