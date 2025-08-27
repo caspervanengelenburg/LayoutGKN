@@ -1,25 +1,20 @@
 import torch
 from sklearn import metrics
 
-from metrics import euclidean_distance, approximate_hamming_similarity
+from LayoutGKN.metrics import euclidean_distance, approximate_hamming_similarity
 
 
 def pairwise_loss(x, y, labels, config):
     """Compute pair-wise margin loss."""
-
     loss_type = config.optimize.distance
     labels = labels.float()
-    if loss_type == 'margin':
-        return torch.relu(config.optimze.margin - labels * (1 - euclidean_distance(x, y)))
-    elif loss_type == 'hamming':
-        return 0.25 * (labels - approximate_hamming_similarity(x, y)) ** 2
-    else:
-        raise ValueError('Unknown loss_type %s' % loss_type)
+    if loss_type == 'margin': return torch.relu(config.optimze.margin - labels * (1 - euclidean_distance(x, y)))
+    elif loss_type == 'hamming': return 0.25 * (labels - approximate_hamming_similarity(x, y)) ** 2
+    else: raise ValueError('Unknown loss_type %s' % loss_type)
 
 
 def triplet_loss(x_1p, x_2p, x_1n, x_3n, cfg):
     """Compute triplet margin loss."""
-
     loss_type = cfg.distance
     if loss_type == 'margin':
         # relu(x) is same as max(0, x)
@@ -36,10 +31,7 @@ def triplet_loss(x_1p, x_2p, x_1n, x_3n, cfg):
 
 
 def auc(scores, labels, **auc_args):
-    """
-    Computes the AUC for pair classification.
-    """
-
+    """Computes the AUC for pair classification."""
     scores_max = torch.max(scores)
     scores_min = torch.min(scores)
     scores = (scores - scores_min) / (scores_max - scores_min + 1e-8)
@@ -49,6 +41,8 @@ def auc(scores, labels, **auc_args):
 
 
 def ghopper_kernel(e_i, e_j, m_i, m_j, mu=1):
+    """GraphHopper kernel given two sets of node features and the
+    corresponding shortest-path matrices."""
     weight_matrix = m_i @ m_j.T
     weight_matrix = weight_matrix.to(e_i.dtype)
     norm_i = torch.sum(e_i ** 2, dim=1)
@@ -80,7 +74,6 @@ def ghopper_loss(feats, shp, batch, margin=1.0, mu=1):
         e_i, e_j = block_feats[i], block_feats[i+1]
         m_i, m_j = block_shp[i], block_shp[i+1]
         outs.append(ghopper_sim(e_i, e_j, m_i, m_j, mu=mu))
-    # Distance = - log (similarity)
     distance = -torch.log(torch.stack(outs))
     distance = distance.view(-1, 2)
     rel_distance = distance[:, 0] - distance[:, 1]

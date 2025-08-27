@@ -64,7 +64,6 @@ def main(mode):
     dir_save = os.path.join(cfg.path_data, "rplan")
     ids, graphs = torch.load(os.path.join(dir_save, f"pyg_graphs_{mode}.pt"), weights_only=False)
     outs = get_shortest_path_matrices(graphs)
-    graphs = [add_combined_vector(G) for G in graphs]
 
     # Adds shortest path matrices (for a given max path length) and adds them to the graph
     delta = 4  # max path length considered
@@ -75,6 +74,8 @@ def main(mode):
     torch.save((ids, graphs), os.path.join(dir_save, f"pyg_graphs_{mode}_Ms.pt"))
     print("Saved SHP-attributed graphs at <<<../data/pyg_graphs_{mode}_Ms.pt>>>\n")
 
+    # # add combined vector to the graphs
+    # graphs = [add_combined_vector(G) for G in graphs]
     # print("Initializing the pairwise similarity matrix ...")
     # S = torch.zeros((len(ids), len(ids)))
     # print("Done\n")
@@ -92,5 +93,5 @@ def main(mode):
     # torch.save(S, os.path.join(f"gh_sim_{mode}.pt"))
 
 if __name__ == '__main__':
-    for mode in ["val", "test"]:
+    for mode in ["train", "val", "test"]:
         main(mode=mode)

@@ -14,6 +14,7 @@ def mlp(feat_dim):
 
 
 def embed_layer(vocab_size, dim, drop=0.5):
+    """Embedding layer for categorical attributes."""
     return nn.Sequential(nn.Embedding(vocab_size, dim),
                          nn.ReLU(),
                          nn.Dropout(drop))
@@ -38,7 +39,6 @@ def cross_attention(x, y, sim=cosine_distance_torch):
 
 def batch_pair_cross_attention(feats, batch, **kwargs):
     """Computes the cross graph attention between pairs of graph for a whole batch."""
-
     # find number of blocks = number of individual graphs in batch
     n_blocks = torch.unique(batch).size()[0]
     # create partitions
@@ -76,46 +76,39 @@ def init_weights(m, gain=1.0, bias=0.01):
 
 
 class GraphEncoder(nn.Module):
-    """Encoder module that projects node and edge features to learnable embeddings."""
-
-    def __init__(self, cfg):  # 1 for binary edge attributes (*eg* presence of door or not)
-        super(GraphEncoder, self).__init__()
-        # node and edge encoders are MLPs
-        self.cats_one_hot = embed_layer(cfg.cats_dim, cfg.node_dim)
-        self.geom_encoder = mlp([cfg.geom_dim, cfg.node_dim])
-        self.node_encoder = mlp([2 * cfg.node_dim, cfg.node_dim])
-        self.edge_encoder = embed_layer(cfg.inter_geom_dim, cfg.edge_dim)
-        # init weights
+    """Projects raw node/edge features to hidden embeddings of dimension cfg.hid_dim."""
+    def __init__(self, cfg):
+        super().__init__()
+        self.cats_encoder = embed_layer(cfg.cats_dim, cfg.hid_dim, drop=getattr(cfg, "drop", 0.5))
+        self.geom_encoder = mlp([cfg.geom_dim, cfg.hid_dim])
+        self.node_encoder = mlp([2 * cfg.hid_dim, cfg.hid_dim])
+        self.edge_encoder = embed_layer(2, cfg.hid_dim)
         init_weights(self.geom_encoder)
         init_weights(self.node_encoder)
         init_weights(self.edge_encoder)
 
-    # Forward method:
-    # Room graphs: x1 = geometry, x2 = category
-    # GED: x1 = ones
-    def forward(self, x1, x2, edge_feat):
-        x1 = self.cats_one_hot(x1)  # one-hot categorical encoding // 5  -> D_v
-        x2 = self.geom_encoder(x2)  # geometry encoding // 12 -> D_v
-        node_encod = torch.cat((x2, x1.squeeze(1)), -1)  # stack // D_v x D_v -> 2*Dv
-        node_encod = self.node_encoder(node_encod)  # full node embedding // 2*D_v -> D_v
-        edge_encod = self.edge_encoder(edge_feat)  # edge encoding // 8 -> D_e
-        return node_encod, edge_encod  # D_v, D_e
+    def forward(self, xn_geom, xn_cat, xe):
+        xn_cat = self.cats_encoder(xn_cat)
+        xn_geom = self.geom_encoder(xn_geom)
+        xn = torch.cat([xn_geom, xn_cat.squeeze(1)], dim=-1)
+        xn = self.node_encoder(xn)
+        xe = self.edge_encoder(xe)
+        return xn, xe
 
 
 # Graph (matching) convolutional layer
 class GConv(MessagePassing):
     """Propagation layer for a graph convolutional or matching network."""
-
     def __init__(self, cfg):
         super(GConv, self).__init__(aggr=cfg.aggr)
         self.matching = cfg.matching
-        self.f_message = torch.nn.Linear(cfg.node_dim*2+cfg.edge_dim, cfg.node_dim)
+        self.f_message = torch.nn.Linear(cfg.hid_dim*2+cfg.hid_dim, cfg.hid_dim)
 
         # Node update: GRU
-        if cfg.matching: self.f_node = torch.nn.GRU(cfg.node_dim*2, cfg.node_dim)
-        else: self.f_node = torch.nn.GRU(cfg.node_dim, cfg.node_dim)
+        if cfg.matching: self.f_node = torch.nn.GRU(cfg.hid_dim*2, cfg.hid_dim)
+        else: self.f_node = torch.nn.GRU(cfg.hid_dim, cfg.hid_dim)
         # batch norm
-        self.batch_norm = BatchNorm(cfg.node_dim)
+        self.batch_norm = BatchNorm(cfg.hid_dim)
         # init
         init_weights(self.f_message, gain=cfg.message_gain)  # default: small gain for message apparatus
         init_weights(self.f_node)
@@ -149,12 +142,11 @@ class GConv(MessagePassing):
 # Graph aggregation / readout function(s)
 class GraphAggregator(torch.nn.Module):
     """Computes the graph-level embedding from the final node-level embeddings."""
-
     def __init__(self, cfg):
         super(GraphAggregator, self).__init__()
-        self.lin = torch.nn.Linear(cfg.node_dim, cfg.graph_dim)
-        self.lin_gate = torch.nn.Linear(cfg.node_dim, cfg.graph_dim)
-        self.lin_final = torch.nn.Linear(cfg.graph_dim, cfg.graph_dim)
+        self.lin = torch.nn.Linear(cfg.hid_dim, cfg.hid_dim)
+        self.lin_gate = torch.nn.Linear(cfg.hid_dim, cfg.hid_dim)
+        self.lin_final = torch.nn.Linear(cfg.hid_dim, cfg.hid_dim)
 
     def forward(self, x, batch):
         x_states = self.lin(x)  # node states // [V x D_v] -> [V x D_F]
@@ -168,7 +160,6 @@ class GraphAggregator(torch.nn.Module):
 # Graph Siamese network
 class GraphSiameseNetwork(torch.nn.Module):
     """Graph siamese network."""
-
     def __init__(self, cfg):
         super(GraphSiameseNetwork, self).__init__()
         # node and edge encoder
@@ -180,11 +171,12 @@ class GraphSiameseNetwork(torch.nn.Module):
         # aggregation / pooling layer
         self.aggregation = GraphAggregator(cfg)
 
-    def forward(self, edge_index, x1, x2, edge_feats, batch):
-        node_feats, edge_feats = self.encoder(x1, x2, edge_feats)
+    def forward(self, ei, xn_geom, xn_cats, xe, batch):
+        # node and edge encoding
+        node_feats, edge_feats = self.encoder(xn_geom, xn_cats, xe)
         # message passing
         for i in range(len(self.prop_layers)):
-            node_feats = self.prop_layers[i](edge_index, node_feats, edge_feats, batch)
+            node_feats = self.prop_layers[i](ei, node_feats, edge_feats, batch)
         # aggregation / pooling
         graph_feats = self.aggregation(node_feats, batch)
         return node_feats, graph_feats
