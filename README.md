@@ -27,11 +27,13 @@ The repository has the following self-explainable structure:
 │   ├── utils
 ├── scripts/
 │   ├── rplan_to_graphs
-|   ├── msd_to_graphs
-│   ├── get_triplets
-│   ├── train
-|   ├── evaluate
-│   ├── visualize
+│   ├── nx_to_pyg
+│   ├── gh_similarity
+|   ├── msd_to_graphs       # tba
+│   ├── generate_triplets
+│   ├── train               # tba
+|   ├── evaluate            # tba
+│   ├── visualize           # tba
 │   cfg.yaml  # general configurations
 ├── pyproject.toml      
 ├── README.md           
