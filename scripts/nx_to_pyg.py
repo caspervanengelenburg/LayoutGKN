@@ -1,4 +1,4 @@
-import os, random, torch
+import os, random
 from tqdm import tqdm
 import networkx as nx
 from omegaconf import OmegaConf
@@ -46,6 +46,7 @@ def remove_attributes_from_graph(graph, node_attr=['polygon'], edge_attr=[]):
             try: del graph.edges[u, v][attr]
             except: pass
     return graph
+
 
 
 def main():

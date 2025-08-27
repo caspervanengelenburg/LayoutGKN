@@ -25,17 +25,17 @@ dependencies = [
 [project.optional-dependencies]
 # Pick CUDA or CPU at install time (you'll still pass the right indexes/links)
 torch-core = [
-  "torch==2.8.0",
-  "torchvision==0.20.0",
+  "torch==2.8.*",
+  "torchvision==0.23.*",
 ]
 
 pyg-core = [
-  "torch-geometric>=2.5,<3",
-  "torch-scatter>=2.1,<2.2",
-  "torch-sparse>=0.6,<0.7",
-  "torch-cluster>=1.6,<1.7",
-  "torch-spline-conv>=1.2,<1.3",
-  "pyg-lib>=0.3,<0.4"
+  "torch-geometric>=2.5",
+  "torch-scatter>=2.1",
+  "torch-sparse>=0.6",
+  "torch-cluster>=1.6",
+  "torch-spline-conv>=1.2",
+  "pyg-lib>=0.3"
 ]
 
 [tool.setuptools]
