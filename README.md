@@ -1,10 +1,13 @@
 # LayoutGKN: Graph Similarity Learning of Floor Plans
 
-TODO: Mention the paper here + links. Include figure.
+TODO: add figure.
+This code repository accompanies the paper *LayoutGKN: Graph Similarity Learning of Floor Plans* (BMVC, 2025).
 
-## Overview
 
-TODO: Write a short (2-4 line) summary of the work, and it's takeaways.
+## tl;dr
+
+TODO: add more
+The goal of our work: learn a neural network to compute the spatial similarity between floor plans.
 
 ## Structure
 
@@ -91,9 +94,10 @@ See `pyproject.toml` for dependencies
 ## Citation
 
 <pre><code>
-@misc{vanengelenburg2025layoutgkn,
+@inproceedings{van_engelenburg_layoutgkn_2025,
       title={LayoutGKN: Graph Similarity Learning of Floor Plans},
       author={van Engelenburg, Casper and van Gemert, Jan and Khademi, Seyran},
+      booktitle={BMVC},
       year={2025}
 }
 </code></pre>
