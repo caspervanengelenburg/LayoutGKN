@@ -24,13 +24,12 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Pick CUDA or CPU at install time (you'll still pass the right indexes/links)
-torch-core = [
+accel-torch = [
   "torch==2.8.*",
   "torchvision==0.23.*",
 ]
 
-pyg-core = [
+accel-pyg = [
   "torch-geometric>=2.5",
   "torch-scatter>=2.1",
   "torch-sparse>=0.6",
@@ -44,10 +43,14 @@ packages = ["LayoutGKN"]
 package-dir = {"" = "src"}
 
 
-# CUDA 12.8
-# uv pip install -i https://download.pytorch.org/whl/cu128 "LayoutGKN[torch-core,pyg-core]" \
-#  -f https://data.pyg.org/whl/torch-2.8.0+cu128.html
-
-# CPU-only
-# uv pip install -i https://download.pytorch.org/whl/cpu "LayoutGKN[torch-core,pyg-core]" \
+# macOS or any CPU-only install (works on macOS/Windows/Linux)
+#uv pip install ".[torch-core,pyg-core]" \
+#  --index-url https://pypi.org/simple \
 #  -f https://data.pyg.org/whl/torch-2.8.0+cpu.html
+
+
+# NVIDIA CUDA (Windows or Linux) — pick your CUDA version
+#uv pip install ".[torch-core,pyg-core]" \
+#  --index-url https://pypi.org/simple \
+#  --extra-index-url https://download.pytorch.org/whl/cu128 \
+#  -f https://data.pyg.org/whl/torch-2.8.0+cu128.html

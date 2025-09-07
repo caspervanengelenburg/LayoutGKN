@@ -1,47 +1,21 @@
 # LayoutGKN: Graph Similarity Learning of Floor Plans
 
-TODO: add figure.
-This code repository accompanies the paper *LayoutGKN: Graph Similarity Learning of Floor Plans* (BMVC, 2025).
+The code accompanies the paper [LayoutGKN: Graph Similarity Learning of Floor Plans](https://arxiv.org/abs/2509.03737), to appear in [BMVC 2025](https://bmvc2025.bmva.org/).
+<br />By [Casper van Engelenburg]() (that's me), [Jan van Gemert](), [Seyran Khademi]()
 
+![method_fig](assets/teaser.jpg)
 
-## tl;dr
+**Abstract** -
+Floor plans depict building layouts and are often represented as graphs to capture the underlying spatial relationships. 
+Comparison of these graphs is critical for applications like search, clustering, and data visualization. 
+The most successful methods to compare graphs i.e., graph matching networks, rely on costly intermediate cross-graph node-level interactions, therefore being slow in inference time. 
+We introduce **LayoutGKN**, a more efficient approach that postpones the cross-graph node-level interactions to the end of the joint embedding architecture. 
+We do so by using a differentiable graph kernel as a distance function on the final learned node-level embeddings. 
+We show that LayoutGKN computes similarity comparably or better than graph matching networks while significantly increasing the speed.
 
-TODO: add more
-The goal of our work: learn a neural network to compute the spatial similarity between floor plans.
+## Updates
 
-## Structure
-
-The repository has the following self-explainable structure:
-
-```text
-├── data/               
-│   ├── rplan
-│   ├── msd 
-├── models/  # pretrained models
-├── src/LayoutGKN  # source code
-│   ├── constants
-│   ├── data
-│   ├── graph
-│   ├── loss
-│   ├── metrics
-│   ├── model
-│   ├── plot
-│   ├── train
-│   ├── utils
-├── scripts/
-│   ├── rplan_to_graphs
-│   ├── nx_to_pyg
-│   ├── gh_similarity
-|   ├── msd_to_graphs       # tba
-│   ├── generate_triplets
-│   ├── train               # tba
-|   ├── evaluate            # tba
-│   ├── visualize           # tba
-│   cfg.yaml  # general configurations
-├── pyproject.toml      
-├── README.md           
-└── LICENSE
-```
+I tried to 
 
 ## Usage
 TODO: Include usage.
