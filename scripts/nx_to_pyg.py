@@ -2,6 +2,7 @@ import os, random
 from tqdm import tqdm
 import networkx as nx
 from omegaconf import OmegaConf
+import torch
 from torch_geometric.utils import from_networkx
 
 from LayoutGKN.utils import load_pickle

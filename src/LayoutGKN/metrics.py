@@ -51,30 +51,21 @@ def accuracy_threshold(d, label): #d = distance - tau! (for comparing with 0!)
         return corrects
 
 
-def compute_ged(g1, g2, ematch=True, nmatch=True):
-    """
-    Computes a normalized graph similarity score based on the
+def compute_ged(Gi, Gj, ematch=True, nmatch=True):
+    """Computes a normalized graph similarity score based on the
     Graph edit distance (GED). The GED is normalized first;
-    an exponential of the negative is the final score.
-    """
-
-    # set GED matching strategy
-    if ematch:
-        edge_match = lambda a, b: a['connectivity'] == b['connectivity']
-    else:
-        edge_match = None
-    if nmatch:
-        node_match = lambda a, b: a['category'] == b['category']
-    else:
-        node_match = None
-
-    # compute graph edit distance (GED)
-    ged = nx.graph_edit_distance(g1, g2,
+    an exponential of the negative is the final score."""
+    # set matching strategy
+    if ematch: edge_match = lambda a, b: a['connectivity'] == b['connectivity']
+    else: edge_match = None
+    if nmatch: node_match = lambda a, b: a['category'] == b['category']
+    else: node_match = None
+    # compute graph edit distance
+    ged = nx.graph_edit_distance(Gi, Gj,
                                  edge_match=edge_match,
                                  node_match=node_match)
-
-    # output the similarity score of the normalized GED
-    return ged, np.exp(- 2 * ged / (g1.number_of_nodes() + g2.number_of_nodes()))
+    # compute normalized version
+    return ged, np.exp(- 2 * ged / (Gi.number_of_nodes() + Gj.number_of_nodes()))
 
 
 def compute_ssig(miou, sged, gamma=0.4):
@@ -89,37 +80,46 @@ def compute_ssig(miou, sged, gamma=0.4):
 
 
 def compute_iou(G1, G2):
-
-    """
-    Computes the Intersection-over-Union (IoU) between two floor plan graphs based
-    on the room shapes and categories.
-    """
-
-    # Extract shape and categorical information from the graph (i.e, the nodes of the graph)
+    """Computes the Intersection-over-Union (IoU) between two floor plan graphs based
+    on the room shapes and categories."""
+    # shape and categorical info
     polygons_1 = [Polygon(d) for _, d in G1.nodes('polygon')]
     polygons_2 = [Polygon(d) for _, d in G2.nodes('polygon')]
     cats_1 = [d for _, d in G1.nodes('category')]
     cats_2 = [d for _, d in G2.nodes('category')]
-
-    # Find all possible categories
+    # combined categories
     categories = list(set(cats_1 + cats_2))
-
-    # Init MIoUs
     ious = []
-
-    # Loop through categories
     for c in categories:
-
-        if c in cats_1 and c in cats_2:  # If category appears in both floor plans
+        if c in cats_1 and c in cats_2:  # if category appears in both
             union_1 = unary_union([poly for poly, cat in zip(polygons_1, cats_1) if cat == c])
             union_2 = unary_union([poly for poly, cat in zip(polygons_2, cats_2) if cat == c])
             intersection = union_1.intersection(union_2)
             union = union_1.union(union_2)
             ious.append(intersection.area / union.area)
-        else:
-            ious.append(0)
-
+        else: ious.append(0)  # if category appears in only one
     return np.mean(ious)
+
+def dist_iou(G1, G2):
+    """Computes the Intersection-over-Union (IoU) between two floor plan graphs based
+    on the room shapes and categories."""
+    # shape and categorical info
+    polygons_1 = [Polygon(d) for _, d in G1.nodes('polygon')]
+    polygons_2 = [Polygon(d) for _, d in G2.nodes('polygon')]
+    cats_1 = [d for _, d in G1.nodes('category')]
+    cats_2 = [d for _, d in G2.nodes('category')]
+    # combined categories
+    categories = list(set(cats_1 + cats_2))
+    ious = []
+    for c in categories:
+        if c in cats_1 and c in cats_2:  # if category appears in both
+            union_1 = unary_union([poly for poly, cat in zip(polygons_1, cats_1) if cat == c])
+            union_2 = unary_union([poly for poly, cat in zip(polygons_2, cats_2) if cat == c])
+            intersection = union_1.intersection(union_2)
+            union = union_1.union(union_2)
+            ious.append(intersection.area / union.area)
+        else: ious.append(0)  # if category appears in only one
+    return 1 - np.mean(ious)
 
 
 def compute_rbo(l1, l2, p=0.98):

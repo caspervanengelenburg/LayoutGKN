@@ -15,12 +15,8 @@ from LayoutGKN.loss import triplet_loss, ghopper_loss
 from LayoutGKN.data import TripletDataset, prep_data
 from LayoutGKN.model import GraphSiameseNetwork
 
-# Globs
-ENTITY_NAME = "casper-van-engelenburg"
-PROJECT_NAME = "LayoutGKN"
 
-
-def train(model, optimizer, dl_train, cfg, epoch, device):
+def train(model, optimizer, dl_train, cfg, device):
     model.to(device); model.train()
     loss_log = AverageMeter()
     acc_log = AverageMeter()
@@ -101,14 +97,14 @@ def run_single(cfg):
     # set environment
     os.environ['MASTER_ADDR'] = 'localhost'
     os.environ['MASTER_PORT'] = str(np.random.randint(2e4, 5e4))  # allows for multiple runs
-    os.environ["WANDB_API_KEY"] = 'c52c284e0d6ab885356b0f83dd3725d320154b96'
+    os.environ["WANDB_API_KEY"] = cfg.wandb.api_key
     os.environ["WANDB_MODE"] = 'online'
     device = torch.device("cuda:0" if torch.cuda.is_available() else 'cpu')
     print(f"Device = {device}\n")
 
     # init w&b
-    wandb.init(entity=ENTITY_NAME,
-               project=PROJECT_NAME,
+    wandb.init(entity=cfg.wandb.entity,
+               project=cfg.wandb.project,
                config=OmegaConf.to_container(cfg, resolve=True, throw_on_missing=True))
 
     # split in train and val
@@ -135,7 +131,7 @@ def run_single(cfg):
     acc_best = 0
     early_stopper.early_stop(acc_best)
     for e in range(cfg.n_epochs):
-        loss_train, acc_train, gvec_train = train(model, optimizer, dl_train, cfg, e, device)
+        loss_train, acc_train, gvec_train = train(model, optimizer, dl_train, cfg, device)
         loss_val, acc_val, gvec_val = validate(model, dl_val, cfg, device)
         metrics = {
             "train/loss": loss_train,
@@ -172,8 +168,8 @@ if __name__ == '__main__':
     cmd_cfg = OmegaConf.from_cli()
     cfg = OmegaConf.merge(cfg, cmd_cfg)
     cfg.path_trips = os.path.join(cfg.path_data, f"rplan/trips{'_HARD_' if cfg.hard else ''}graphs_train.pt")
-    # set mu based on node dimension
+    # set mu (=avg of Gaussian radial basis function) based on node dimension
     if cfg.kernel_loss:
-        sigma = (cfg.hid_dim / 2) ** 0.5  # std of Gaussian kernel
-        cfg.mu = 1 / (2 * (sigma ** 2))  # avg of Gaussian kernel
+        sigma = (cfg.hid_dim / 2) ** 0.5  # std
+        cfg.mu = 1 / (2 * (sigma ** 2))  # avg
     run_single(cfg)

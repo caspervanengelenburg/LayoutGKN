@@ -18,7 +18,8 @@ dependencies = [
   "notebook",
   "wandb",
   "grakel",
-  "rasterio"
+  "rasterio",
+  "opencv-python"
   # NOTE: torch*, torch_* moved to extras below
 ]
 
