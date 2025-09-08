@@ -1,0 +1,45 @@
+# TODO: make all hierarchical (eg, model.dim_geom)
+
+# dimensions and sizes
+geom_dim: 6
+cats_dim: 8
+hid_dim: 64
+num_layers: 5
+
+# network settings
+matching: false
+message_gain: 0.1
+graph_reg: true
+graph_vec_weight: 5e-4
+aggr: add
+drop: 0
+
+# optimization
+cuda: true
+distance: margin
+margin: 0.1
+kernel_loss: False
+n_epochs: 100
+lr: 1e-4
+bs: 64
+step: 10
+print_freq: 0.1
+
+# data
+hard: true  # hard negatives (or not)
+data: rplan
+weak_label: sged
+
+# paths
+path_root: ${oc.env:LAYOUTGKN_ROOT,${oc.env:HOME}/PycharmProjects/LayoutGKN}  # change to your own
+path_checkpoint: ${oc.env:LAYOUTGKN_CKPT,${path_root}/models}
+path_data: ${oc.env:LAYOUTGKN_DATA,${path_root}/data}  # for graphs, etc.
+path_rplan: ${oc.env:LAYOUTGKN_CKPT,${path_root}/rplan}  # rplan original dataset
+path_msd: ${oc.env:LAYOUTGKN_CKPT,${path_root}/msd}  # msd original dataset
+
+# wandb
+wandb:
+  entity: casper-van-engelenburg
+  project: LayoutGKN
+  mode: online
+  api_key: false

@@ -1,7 +1,11 @@
 # LayoutGKN: Graph Similarity Learning of Floor Plans
 
 The code accompanies the paper [LayoutGKN: Graph Similarity Learning of Floor Plans](https://arxiv.org/abs/2509.03737), to appear in [BMVC 2025](https://bmvc2025.bmva.org/).
-<br />By [Casper van Engelenburg]() (that's me), [Jan van Gemert](), [Seyran Khademi]()
+<br />
+By 
+[Casper van Engelenburg](https://caspervanengelenburg.github.io/) (👋), 
+[Jan van Gemert](https://jvgemert.github.io/), 
+[Seyran Khademi](https://www.tudelft.nl/en/ewi/over-de-faculteit/afdelingen/intelligent-systems/pattern-recognition-bioinformatics/computer-vision-lab/people/seyran-khademi).
 
 ![method_fig](assets/teaser.jpg)
 
