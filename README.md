@@ -17,17 +17,20 @@ We introduce **LayoutGKN**, a more efficient approach that postpones the cross-g
 We do so by using a differentiable graph kernel as a distance function on the final learned node-level embeddings. 
 We show that LayoutGKN computes similarity comparably or better than graph matching networks while significantly increasing the speed.
 
-## TODOs
+## 🛠
 
-Few elements are missing (1 script and checkpoints), and I think that here and there extra explanations could help a lot in understanding the code and how to use it (eg, by adding notebooks).
-The following things will be finished before the conference in Sheffield:
+It is a work-in-progress repository.
+Few elements are missing still and I think that here and there extra explanations could help a lot in understanding the code and how to use it (eg, by adding notebooks).
+The following will be added before the start of the conference in Sheffield:
 
-- [ ] Script for generating the triplets
-- [ ] Add model checkpoints (in `models/`)
-- [ ] Add explanation (in `README.md`) on graph formats (networkx, pytorch geometric, node features, edge features, triplets of graphs)
-- [ ] Extra notebooks to provide more information on: training, evaluation, and visualization
+- [ ] `.py` Script for evaluation
+- [ ] `.py` Script for generating the triplets
+- [ ] `.ipynb` Notebook on training and evaluation
+- [ ] `.ipynb` Notebook on visualizing the data, running models for retrieval, and making cool and informative 2D search maps using tSNE.
+- [ ] 🚩 Add properly trained model checkpoints to `models/`
+- [ ] 🔍 Add explanation on floor plan graph definition and formats to `README.md`: `networkx` and `pytorch geometric` packages; node-, edge-, and graph-level attributes; graph triplets.
 
-Nonetheless, the repo including publicly available preprocessed data should be enough to train your own models!
+Nonetheless, the repo including publicly available preprocessed data (see section `Data` below) should be enough to train your own models!
 
 ## Usage
 
@@ -67,8 +70,10 @@ Second, create a subfolder within `data/rplan`, for instance `original`, to stor
 Third you run the preprocessing script:
 
 ```bash
-python -m scripts.rplan_to_graph.run
+python -m scripts.rplan_to_graph.run --path_rplan=PATH/TO/RPLAN/IMAGES --path_data=PATH/TO/RPLAN/GRAPHS
 ```
+
+If your folders align with the default config (`conf/default.yaml`), you don't have to specify the paths in the terminal.
 
 ## Training and evaluation
 
