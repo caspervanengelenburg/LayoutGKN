@@ -58,28 +58,58 @@ Btw, they have great tutorials on graph machine learning and processing.
 
 ## Data
 
-The preprocessed RPLAN data (*i.e.*, the graphs and triplets) can be downloaded from our [public drive folder](https://drive.google.com/drive/u/0/folders/1eS91rwmkw6s74bPcpl_PbgsoOvaQzseQ).
+This is the kind of data we use:
+
+![](assets/data.jpg)
+
+The preprocessed RPLAN data (ie, the graphs and triplets) can be downloaded from our [public drive folder](https://drive.google.com/drive/u/0/folders/1eS91rwmkw6s74bPcpl_PbgsoOvaQzseQ).
 Using this data in your project?
-Make sure to *always* cite the [RPLAN paper](http://staff.ustc.edu.cn/~fuxm/projects/DeepLayout/index.html).
+Make sure to always cite the [RPLAN paper](http://staff.ustc.edu.cn/~fuxm/projects/DeepLayout/index.html).
 
 You can also produce the graphs yourself from the original images.
 First [download the RPLAN dataset by filling in the survey](https://docs.google.com/forms/d/e/1FAIpQLSfwteilXzURRKDI5QopWCyOGkeb_CFFbRwtQ0SOPhEg0KGSfw/viewform).
 If they accept your request, you will receive an email with the download link.
-Second, create a subfolder within `data/rplan`, for instance `original`, to store the images and change the default config (`confg/default.yaml`) accordingly, simply by changing the key `path_rplan`.
+Second, create a subfolder within "data/rplan", for instance "original", to store the images and change the default config ("confg/default.yaml") accordingly, simply by changing the key `path_rplan`.
 Third you run the preprocessing script:
 
 ```bash
 python -m scripts.rplan_to_graph.run --path_rplan=PATH/TO/RPLAN/IMAGES --path_data=PATH/TO/RPLAN/GRAPHS
 ```
 
-If your folders align with the default config (`conf/default.yaml`), you don't have to specify the paths in the terminal.
+If your folders align with the default config ("conf/default.yaml"), you don't have to specify the paths in the terminal.
 
-## Training and evaluation
+## Training
 
-For running a single training run + (optionally) log to W&B:
+Please have a look at our paper for details on training. 
+Here is an overview:
+
+![](assets/method.jpg)
+
+(**A. graph extraction**) 
+Semantic images from RPLAN are converted into richly-attributed access graphs. 
+The floor plans' geometries (\ie, the rooms represented as polygons) are centered at $(0,0)$ and scaled to fit within the unit square box.
+The unit box amounts to 20 x 20 meters in reality (\ie, 0.1 equals 1 meter).
+The color indicates the room's semantic category (\eg, dark orange for living room, green for balcony).
+Edges are modeled when two rooms share a door (black) or a wall (white edge).
+(**B. attributes**) 
+Each node represents a room and is endowed with 3 attributes: the shortest-path matrix, a one-hot encoding of the room's category and a vector of shape features.
+(**C. training**)
+LayoutGKN is trained using triplets of graphs, each containing an anchor ($G_a$), positive ($G_a$), and negative ($G_a$) graph.
+The goal is to penalize the relative distance between anchor-positive and anchor-negative.
+Anchor, positive, and negative are simultaneously fed into parameter-shared graph neural networks, which consist of a node encoder (dark gray box), followed by a series of $L$ graph message passing network layers (light gray box).
+This results in embedded graphs ($H_i$).
+The anchor-positive and anchor-negative similarities are computed as $s_{\text{ap}} = k_G (H_a, H_p)$ and $s_{\text{an}} = k_G (H_a, H_n)$, respectively.
+Here $k_G (H_i, H_j)$ is the GraphHopper path-based kernel on the node embeddings of $H_i$ and $H_j$.
+The triplet loss $\mathcal{L}_t$ penalizes the relative distance $\log(s_{\text{an}} / s_{\text{ap}})$, given a margin $m$.
+
+For running a single training run:
 ```bash
 python -m scripts.run --lr=1e-4 --num_layers=4  # etc. see cfg.yaml
 ```
+
+By default, weights and biases (W&B) is used for logging.
+Don't want to use it, you can simply remove the W&B parts in the "scripts/run.py" script.
+I highly encourage to always use W&B.
 
 ## Citation
 
