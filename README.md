@@ -42,11 +42,19 @@ cd LayoutGKN
 
 And install it using `uv`:
 ```bash
-uv pip install ".[torch-core,pyg-core]" \
-  --index-url https://pypi.org/simple \
-  --extra-index-url https://download.pytorch.org/whl/cu128 \
-  -f https://data.pyg.org/whl/torch-2.8.0+cu128.html
+uv pip install .
 ```
+
+And install Pytorch Geometric (PyG) using a correct wheel, for instance PyTorch 2.8 with CUDA 12.8:
+
+```bash
+ uv pip install torch-geometric torch-scatter torch-sparse torch-cluster torch-spline-conv pyg-lib \
+    --find-links https://data.pyg.org/whl/torch-2.8.0+cu128.html
+```
+
+Note that not all "pairings" between PyTorch and PyG exist.
+For more details, see the [PyG Docs on Installation](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html).
+Btw, they have great tutorials on graph machine learning and processing.
 
 Or CPU variant:
 ```bash
