@@ -34,7 +34,7 @@ weak_label: sged
 path_root: ${oc.env:LAYOUTGKN_ROOT,${oc.env:HOME}/PycharmProjects/LayoutGKN}  # change to your own
 path_checkpoint: ${oc.env:LAYOUTGKN_CKPT,${path_root}/models}
 path_data: ${oc.env:LAYOUTGKN_DATA,${path_root}/data}  # for graphs, etc.
-path_rplan: ${oc.env:LAYOUTGKN_CKPT,${path_root}/rplan}  # rplan original dataset
+path_rplan: ${oc.env:LAYOUTGKN_CKPT,${path_root}/data/rplan/original}  # rplan original dataset
 path_msd: ${oc.env:LAYOUTGKN_CKPT,${path_root}/msd}  # msd original dataset
 
 # wandb
