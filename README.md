@@ -56,15 +56,6 @@ Note that not all "pairings" between PyTorch and PyG exist.
 For more details, see the [PyG Docs on Installation](https://pytorch-geometric.readthedocs.io/en/latest/install/installation.html).
 Btw, they have great tutorials on graph machine learning and processing.
 
-Or CPU variant:
-```bash
-uv pip install ".[torch-core,pyg-core]" \
-  --index-url https://pypi.org/simple \
-  -f https://data.pyg.org/whl/torch-2.8.0+cpu.html
-```
-
-If these lines for some reason do not work, please have a look at the dependencies in `pyproject.toml`.
-
 ## Data
 
 The preprocessed RPLAN data (*i.e.*, the graphs and triplets) can be downloaded from our [public drive folder](https://drive.google.com/drive/u/0/folders/1eS91rwmkw6s74bPcpl_PbgsoOvaQzseQ).
